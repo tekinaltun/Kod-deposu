@@ -1,0 +1,18 @@
+#powershell 
+
+$cred = Get-Credential 
+Add-AzureRmAccount -Credential $cred 
+Get-AzureRmSubscription 
+Set-AzureRmContext -SubscriptionId "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" 
+
+$allvms = Get-AzureRmVM | where {$_.OSProfile.LinuxConfiguration -eq $null}
+
+foreach ($vm in $allvms)
+{ 
+    Remove-AzureRmVMCustomScriptExtension -ResourceGroupName $vm.ResourceGroupName `
+    -VMName $vm.Name -Name "myCustomScript" -force
+
+    Set-AzureRmVMCustomScriptExtension -ResourceGroupName $vm.ResourceGroupName `
+    -VMName $vm.Name -Name "myCustomScript" `
+    -FileUri "https://XXXXXXXXXXXXXXXXXXXXXXXXX/omsscript/XXXX.ps1" `
+    -Run "XXXX.ps1" -Location "West Europe"
